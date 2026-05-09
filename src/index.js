@@ -20,7 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobsRoutes);
 app.use('/api/quotes', quotesRoutes);
 app.use('/api/profiles', profilesRoutes);
-
+app.use('/api/messages', require('./routes/messages'));
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err);
