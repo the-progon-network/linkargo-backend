@@ -91,13 +91,12 @@ router.post('/:jobId', authMiddleware, async (req, res) => {
     }
 
     // Increment quote_count on job
-    await supabase.rpc('increment_quote_count', { job_id: req.params.jobId }).catch(() => {
-      // Fallback if RPC not set up
-      supabase.from('jobs').select('quote_count').eq('id', req.params.jobId).single()
-        .then(({ data }) => {
-          supabase.from('jobs').update({ quote_count: (data?.quote_count || 0) + 1 }).eq('id', req.params.jobId);
-        });
-    });
+    try {
+      const { data: jobData } = await supabase.from('jobs').select('quote_count').eq('id', req.params.jobId).single();
+      await supabase.from('jobs').update({ quote_count: (jobData?.quote_count || 0) + 1 }).eq('id', req.params.jobId);
+    } catch (e) {
+      console.error('quote_count update failed:', e);
+    }
 
     res.status(201).json({ quote });
   } catch (err) {
